@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+char *path = "/sys/class";
+
 char *_cat_with(char c, ...) {
   size_t size = 32;
   size_t length = 0;

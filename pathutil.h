@@ -3,8 +3,6 @@
 
 #include "brightnesslib.h"
 
-char *path = "/sys/class";
-
 extern char *_cat_with(char, ...);
 #define cat_with(...) _cat_with(__VA_ARGS__, NULL)
 

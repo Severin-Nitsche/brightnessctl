@@ -19,6 +19,8 @@
 # endif
 #endif
 
+char *classes[] = { "backlight", "leds", NULL };
+
 bool do_write_device(struct device *d) {
   FILE *f;
   char c[16];

@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-char *classes[] = { "backlight", "leds", NULL };
-
 struct device {
   char *class;
   char *id;
