@@ -22,7 +22,7 @@ struct options {
   char *class;
 };
 
-extern void print_help();
+extern void print_help(struct options *);
 extern void print_version();
 extern int get(struct options *);
 extern int set(struct options *);

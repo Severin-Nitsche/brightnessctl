@@ -138,7 +138,7 @@ int main(int argc, char *const *argv) {
     );
   }
   if (options.help || error || options.operation == UNSET) {
-    print_help();
+    print_help(&options);
     return error;
   }
   if (options.version) {

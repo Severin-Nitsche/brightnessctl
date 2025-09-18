@@ -11,7 +11,6 @@
 
 ## Options
 
-- `-q, --quiet`
 - `-p, --pretend`
 - `-m, --machine-readable`
 - `-d, --device=DEVICE`
@@ -24,6 +23,7 @@
 
 `brightnessctl set [options] [value]
 
+- `-q, --quiet`
 - `-n, --min-value=n`
 - `-e, --exponent[=K]`
 - `-r, --restore`
