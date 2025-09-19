@@ -96,9 +96,12 @@ int find_value(struct device *device, struct options *options) {
   }
 
   if (percent) {
-    float percentage = value_in_percent(value, device, options);
+    float percentage;
     if (positive || negative) {
+      percentage = value_in_percent(value, device, options);
       percentage += res;
+    } else {
+      percentage = res;
     }
     value = percent_in_value(percentage, device, options);
   } else if (positive || negative) {
