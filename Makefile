@@ -1,6 +1,6 @@
 include config.mk
 
-VERSION = 0.5
+VERSION = 0.6
 CFLAGS += -std=c99 -g -Wall -Wextra -DVERSION=\"${VERSION}\" -D_POSIX_C_SOURCE=200809L
 LDLIBS += -lm
 
@@ -9,9 +9,9 @@ MANDIR = ${DESTDIR}${PREFIX}/share/man
 
 INSTALL_UDEV_1 = install_udev_rules
 
-brightnessctl: pathutil.o brightnesslib.o brightnessprog.o brightnessutil.o restoreutil.o
-
 all: brightnessctl brightnessctl.1
+
+brightnessctl: pathutil.o brightnesslib.o brightnessprog.o brightnessutil.o restoreutil.o
 
 config.mk:
 	@echo "You need to run ./configure first"
@@ -28,6 +28,7 @@ install_udev_rules:
 
 clean:
 	rm -f brightnessctl
+	rm -f *.o
 
 distclean: clean
 	${RM} config.mk
