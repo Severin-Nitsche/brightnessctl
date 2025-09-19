@@ -14,10 +14,10 @@ struct options {
   bool save;
   bool restore;
   bool list;
-  int min_value;
   int exponent;
-  int set_to;
+  unsigned int min_value;
   enum operation operation;
+  char *set_to;
   char *device;
   char *class;
 };

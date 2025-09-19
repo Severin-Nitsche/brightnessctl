@@ -16,7 +16,7 @@ static struct options options = {
   .list = false,
   .min_value = 0,
   .exponent = 1,
-  .set_to = -1,
+  .set_to = NULL,
   .operation = UNSET,
   .device = NULL,
   .class = NULL
@@ -125,12 +125,10 @@ int main(int argc, char *const *argv) {
   // If applicable (and present) we get the value for the set command
   if (options.operation == SET) {
     if (optind < optc)
-      options.set_to = strtol(opts[optind], NULL, 10);
+      options.set_to = opts[optind];
     else
       options.help |= !options.restore;
-  } else if (options.operation == GET) {
-    options.help |= !options.list && !options.device && !options.class;
-  }
+  } 
 
   // Now we determine what to do
   if (error) {
