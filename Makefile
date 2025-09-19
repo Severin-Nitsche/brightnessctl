@@ -9,7 +9,7 @@ MANDIR = ${DESTDIR}${PREFIX}/share/man
 
 INSTALL_UDEV_1 = install_udev_rules
 
-brightnessctl: pathutil.o brightnesslib.o brightnessprog.o
+brightnessctl: pathutil.o brightnesslib.o brightnessprog.o brightnessutil.o
 
 all: brightnessctl brightnessctl.1
 

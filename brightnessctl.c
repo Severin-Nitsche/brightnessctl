@@ -100,7 +100,10 @@ int main(int argc, char *const *argv) {
       case 'e':
         // Unchecked conversion from long to int
         // (Very high exponents lead to unexpected behavior)
-        options.exponent = strtol(optarg, NULL, 10);
+        if (optarg)
+          options.exponent = strtol(optarg, NULL, 10);
+        else
+          options.exponent = 4;
         break;
       case 'r':
         options.restore = true;
@@ -120,10 +123,13 @@ int main(int argc, char *const *argv) {
   }
 
   // If applicable (and present) we get the value for the set command
-  if (options.operation == SET && optind < optc) {
-    options.set_to = strtol(opts[optind], NULL, 10);
-  } else {
-    options.help |= !options.restore;
+  if (options.operation == SET) {
+    if (optind < optc)
+      options.set_to = strtol(opts[optind], NULL, 10);
+    else
+      options.help |= !options.restore;
+  } else if (options.operation == GET) {
+    options.help |= !options.list && !options.device && !options.class;
   }
 
   // Now we determine what to do
