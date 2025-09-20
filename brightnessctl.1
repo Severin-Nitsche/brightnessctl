@@ -1,165 +1,135 @@
-.TH "BRIGHTNESSCTL" "1" "2024-11-18" "brightnessctl" "brightnessctl"
-
+.TH "BRIGHTNESSCTL" "1" "2025-09-20" "brightnessctl" "brightnessctl"
+. 
 .SH "NAME"
 brightnessctl \- read and control device brightness
-
-
+.
+.
 .SH "SYNOPSIS"
-
-.sp
-\fIbrightnessctl\fR [options] \fI[operation]\fR [value...]
-
-
+\fBbrightnessctl\fR [\fBget\fR|\fBset\fR] [\fIOPTION\fR]... [\fIVALUE\fR]
+.
+.
+.SH "DESCRIPTION"
+.P
+Controls and retrieves the brightness of various devices like backlights
+or leds.
+Depending on the compilation, it uses the dbus or writes to the
+files in /sys/class directly, whereas the latter requires root to execute.
+.
+.
 .SH "OPTIONS"
-
-.sp
-\fB\-h, \-\-help\fP
-.RS 4
-Print this help.
-.RE
-
-.sp
-\fB\-l, \-\-list\fP
-.RS 4
-List devices with available brightness controls.
-.RE
-
-.sp
-\fB\-q, \-\-quiet\fP
-.RS 4
-Suppress output.
-.RE
-
-.sp
-\fB\-p, \-\-pretend\fP
-.RS 4
-Do not perform write operations.
-.RE
-
-.sp
-\fB\-m, \-\-machine\-readable\fP
-.RS 4
-Produce machine\-readable output.
-.RE
-
-.sp
-\fB\-P, \-\-percentage\fP
-.RS 4
-Display value as a percentage in get.
-.RE
-
-.sp
-\fB\-n, \-\-min\-value\fP=\fI[VALUE]\fP
-.RS 4
-Set minimum brightness when using delta values. VALUE is set to 1 when not provided.
-.RE
-
-.sp
-\fB\-e, \-\-exponent\fP=\fIK\fP
-.RS 4
-Changes percentage scaling curve to exponential (linear by default). Default exponent is 4.
-
-Percentage equation: % = \fI[VALUE]\fR^\fI[K]\fR * \fI[MAX]\fR * 100^-\fI[K]\fR.
-
-The exponential curve may make the adjustments perceptually equal.
-.RE
-
-.sp
-\fB\-s, \-\-save\fP
-.RS 4
-Save state in a temporary file.
-.RE
-
-.sp
-\fB\-r, \-\-restore\fP
-.RS 4
-Restore previously\-saved state.
-.RE
-
-.sp
-\fB\-d, \-\-device\fP=\fIDEVICE\fP
-.RS 4
-Specify device name (can be a wildcard).
-
-If device is specified as \fB'*'\fP, only \fBbrightness\fP class devices are selected.
-.RE
-
-.sp
-\fB\-c, \-\-class\fP=\fICLASS\fP
-.RS 4
-Specify device class.
-.RE
-
-.sp
-\fB\-V, \-\-version\fP
-.RS 4
-Print version and exit.
-.RE
-
-
-.SH "OPERATIONS"
-
-.sp
-\fBi, info\fP
-.RS 4
-Get device info.
-.RE
-
-.sp
-\fBg, get\fP
-.RS 4
-Get the current brightness of the device.
-.RE
-
-.sp
-\fBm, max\fP
-.RS 4
-Get the maximum brightness of the device.
-.RE
-
-.sp
-\fBs, set\fP \fIVALUE\fP
-.RS 4
-Set the brightness of the device.
-
-.SS VALUES
+.SS "General"
+.TP
+.B \-p\fR, \fB\-\-pretend
+do not perform write operation
+.
+.TP
+.B \-m\fR, \fB\-\-machine-readable
+produce machine readable output
+.
+.TP
+.B \-d\fR, \fB\-\-device=\fIDEVICE
+specify device name
+.
+.TP
+.B \-c\fR, \fB\-\-class=\fICLASS
+specify device class
+.
+.TP
+.B \-h\fR, \fB\-\-help
+print a help message
+.
+.TP
+.B \-v\fR, \fB\-\-version
+print version and exit
+.
+.TP
+.B \-e\fR, \fB\-\-exponent\fR[\fB=\fIK\fR]
+set exponent of brightnesscurve
+.br
+If the flag is not provided a linear curve is used (\fIK\fR=1).
+If the flag is provided without any argument, \fIK\fR=4 is used.
+.
+.TP
+.B \-q\fR, \fB\-\-quiet
+suppress output
+.br
+This silences some error messages (but not error return codes) and
+superflous messages for `get` and `set`.
+.
+.TP
+.B \-s\fR, \fB\-\-save
+save previous state in a temporary file
+.
+.
+.SS "Set"
 .P
-You may specify \fIVALUE\fR for the \fBset\fR command in absolute or relative form, and
-as a value or a delta from the current value. For example:
+The set operation sets the brightness of the device specified through
+\fB\-\-device=\fIDEVICE\fR and \fB\-\-class=\fICLASS\fR.
+In general, it expects a \fIVALUE\fR to be provided in one of the
+following formats:
+.
+.TP
+.I NN
+where \fINN\fR is a non-negative integer
+.br
+This sets the brightness to the absolute value \fINN\fR.
+.
+.TP
+.I NN\fB%
+This sets the brightness to \fINN\fR% of the maximum brightness.
+It will respect the \fB\-\-exponent\fR[\fB=\fIK\fR] setting.
+The curve is:
+.br
+.I NN\fR%^\fIK\fR * MAXIMUM_BRIGHTNESS.
+.
+.TP
+.B +\fINN\fR[\fB%\fR]
+This increases the brightness by \fINN\fR[\fB%\fR].
+.
+.TP
+.I NN\fR[\fB%\fR]\fB-
+This decreases the brightness by \fINN\fR[\fB%\fR].
+.
 .P
-\fBbrightnessctl set 500\fR
-.RS "4"
-Sets brightness to 500.
+The following are a list of options specific to the use with set.
+.
+.TP
+.B \-n\fR, \fB\-\-min\-value=\fIn
+set minimum brightness
+.br
+This overrides any value computation.
+.
+.TP
+.B \-r\fR, \fB\-\-restore
+restore previously saved state
+.br
+If this flag is set, providing a \fIVALUE\fR is not required as the
+brightness will be restored from a previous call with \fB\-\-save\fR.
+The two can be used together (after an initial save) to toggle between the
+current and the previous state.
+.
+.SS "Get"
 .P
-.RE
-\fBbrightnessctl set 50%\fR
-.RS "4"
-Sets brightness to 50% of the maximum.
-.P
-.RE
-\fBbrightnessctl set 50-\fR
-.RS "4"
-Subtracts 50 from the current brightness.
-.P
-.RE
-\fBbrightnessctl set +10\fR
-.RS "4"
-Adds 10 to the current brightness.
-.P
-.RE
-\fBbrightnessctl set 50%-\fR
-.RS "4"
-Subtracts 50% of the maximum from the current brightness.
-.P
-.RE
-\fBbrightnessctl set +10%\fR
-.RS "4"
-Adds 10% of the maximum to the current brightness.
-.P
-.RE
-.SH AUTHORS
-.P
-Maintained by Mykyta Holubakha, who is assisted by other open source
-contributors. For more information about brightnessctl development, visit:
-.P
-https://github.com/Hummer12007/brightnessctl
+The get operation retrieves the brightness of the specified device.
+.
+.TP
+.B \-l\fR, \fB\-\-list
+List info for all devices
+.br
+This is useful to get the class and name of a device if you don't know it.
+.
+.
+.SH "EXIT STATUS"
+.TP
+0
+everything is fine
+.TP
+1
+an error occurred
+.br
+In some cases you will still get the output you wanted from this.
+For example, if you do not (fully) specify the device you want to use,
+the program will default to what is probably the backlight of your main
+monitor.
+When doing so it will also print a huge complaint about that if it is
+not silenced with \fB\-\-quiet\fR.

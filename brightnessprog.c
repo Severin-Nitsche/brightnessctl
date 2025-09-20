@@ -14,7 +14,7 @@ void print_help(struct options *options) {
     "Options:\n"
     "  -p, --pretend           do not perform write operations\n"
     "  -m, --machine-readable  produce machine readable output\n"
-    "  -d, --device=DEVICE     specify device name (can be a wildcard)\n"
+    "  -d, --device=DEVICE     specify device name\n"
     "  -c, --class=CLASS       specify device class\n"
     "  -h, --help              print this help message\n"
     "  -v, --version           print version and exit\n"
