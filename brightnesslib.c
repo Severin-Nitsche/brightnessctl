@@ -8,15 +8,7 @@
 #include <string.h>
 
 #ifdef ENABLE_LOGIND
-# if defined(HAVE_LIBSYSTEMD)
-#  include <systemd/sd-bus.h>
-# elif defined(HAVE_LIBELOGIND)
-#  include <elogind/sd-bus.h>
-# elif defined(HAVE_BASU)
-#  include <basu/sd-bus.h>
-# else
-#  error "No dbus provider found"
-# endif
+#include <systemd/sd-bus.h>
 #endif
 
 char *classes[] = { "backlight", "leds", NULL };

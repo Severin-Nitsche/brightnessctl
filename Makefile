@@ -13,10 +13,10 @@ MODE_0 = 4711
 MODE_1 = 0755
 MODE = ${MODE_${INSTALL_UDEV_RULES}}
 
-ifdef ENABLE_SYSTEMD
+ifdef ENABLE_LOGIND
 	CFLAGS += ${shell pkg-config --cflags libsystemd}
 	LDLIBS += ${shell pkg-config --libs libsystemd}
-	CPPFLAGS += -DENABLE_SYSTEMD
+	CPPFLAGS += -DENABLE_LOGIND
 	INSTALL_UDEV_RULES=0
 	MODE = 0755
 endif
