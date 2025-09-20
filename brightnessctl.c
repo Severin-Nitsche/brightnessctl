@@ -141,7 +141,7 @@ int main(int argc, char *const *argv) {
       "This should never happen."
     );
   }
-  if (options.help || error || options.operation == UNSET) {
+  if (options.help || error || (options.operation == UNSET && !options.version)) {
     print_help(&options);
     return error;
   }
