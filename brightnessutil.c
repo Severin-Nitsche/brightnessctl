@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define EPS .00001
+
 void print_device(struct device *device, struct options *options) {
   char *format = options->machine_readable ?
     "%s,%s,%d,%f%%,%d\n" :
@@ -16,7 +18,7 @@ void print_device(struct device *device, struct options *options) {
     device->id,
     device->class,
     device->curr_brightness,
-    value_in_percent(device->curr_brightness, device, options),
+    value_to_percent(device->curr_brightness, device, options),
     device->max_brightness
   );
 }
@@ -54,20 +56,20 @@ struct device *find_device(struct options *options, int *error) {
   return device;
 }
 
-float value_in_percent(int value, struct device *device, struct options *options) {
+float value_to_percent(float value, struct device *device, struct options *options) {
   if (value <= 0)
     return 0;
-  return powf(((float) value) / device->max_brightness, 1.0f / options->exponent) * 100;
+  return powf(value / device->max_brightness, 1.0f / options->exponent) * 100;
 }
 
-int percent_in_value(float percent, struct device *device, struct options *options) {
+unsigned int percent_to_value(float percent, struct device *device, struct options *options) {
   if (percent <= 0)
     return 0;
   return roundf(powf(percent / 100, options->exponent) * device->max_brightness);
 }
 
 int find_value(struct device *device, struct options *options) {
-  // TODO look at `options->set_to`
+  // look at `options->set_to`
   // if relative (i. e. +X or X-) look at device->curr_brightness
   // if X=Y% convert to value
   
@@ -84,29 +86,56 @@ int find_value(struct device *device, struct options *options) {
     negative |= end[1] == '-';
 
   // Now find real value
-  int value = res;
+  if (!percent && !negative && !positive) // absolute linear
+    return res;
+  
+  if (!percent) // relative linear
+    return device->curr_brightness + (negative ? -res : res);
+
+  if (!negative && !positive) // absolute exp
+    return percent_to_value(res, device, options);
+
+  if (res == 0) // bad for calc
+    return device->curr_brightness;
 
 
-  if (negative) {
-    res *= -1;
-  }
-
-  if (positive || negative) {
-    value = device->curr_brightness;
-  }
-
-  if (percent) {
-    float percentage;
-    if (positive || negative) {
-      percentage = value_in_percent(value, device, options);
-      percentage += res;
+  int i;
+  float p = 100;
+  for(i = 0; i <= 100/res; i++) {
+    float sup = value_to_percent(
+      device->curr_brightness + 0.5, 
+      device, 
+      options
+    ) + res*i;
+    float inf = value_to_percent(
+      device->curr_brightness - 0.5,
+      device,
+      options
+    ) + res*i; 
+    if (inf <= 100 + EPS) {
+      p = sup < 100 ? sup : 100;
     } else {
-      percentage = res;
+      i--;
+      break;
     }
-    value = percent_in_value(percentage, device, options);
-  } else if (positive || negative) {
-    value += res;
   }
 
-  return value;
+  // We have the supremum percentage in p
+  // an exact (float) conversion to value
+  // would yield something that (barely)
+  // could not reach the current value.
+  // But we use rounding and floats are
+  // not exact. Thus we check:
+
+  int base = percent_to_value(p, device, options);
+  unsigned int reconstructed;
+  float pp;
+  do {
+    pp = value_to_percent(base, device, options);
+    reconstructed = percent_to_value(pp - i*res, device, options);
+    base--;
+  } while (device->curr_brightness < reconstructed);
+
+  i = positive ? i-1 : i+1;
+  return percent_to_value(pp - i*res, device, options);
 }

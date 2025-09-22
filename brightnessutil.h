@@ -9,8 +9,8 @@
 extern void print_device(struct device *, struct options *);
 extern void print_and_save_device(struct device *, struct options *);
 extern struct device *find_device(struct options *, int *);
-extern float value_in_percent(int, struct device *, struct options *);
-extern int percent_in_value(float, struct device *, struct options *);
+extern float value_to_percent(float, struct device *, struct options *);
+extern unsigned int percent_to_value(float, struct device *, struct options *);
 extern int find_value(struct device *, struct options *);
 
 #endif
