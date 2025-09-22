@@ -19,7 +19,7 @@ void print_help(struct options *options) {
     "  -h, --help              print this help message\n"
     "  -v, --version           print version and exit\n"
     "  -e, --exponent[=K]      set exponent of brightnesscurve\n"
-    "                          (Default: 1, linear; 4 if provided without K)\n"
+    "                          (Default: 1, linear; 3 if provided without K)\n"
     "  -q, --quiet             suppress output\n"
     "  -s, --save              save previous state in a temporary file\n";
   const char *set_options = 

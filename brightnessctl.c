@@ -103,7 +103,7 @@ int main(int argc, char *const *argv) {
         if (optarg)
           options.exponent = strtol(optarg, NULL, 10);
         else
-          options.exponent = 4;
+          options.exponent = 3;
         break;
       case 'r':
         options.restore = true;
