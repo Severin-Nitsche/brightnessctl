@@ -98,44 +98,50 @@ int find_value(struct device *device, struct options *options) {
   if (res == 0) // bad for calc
     return device->curr_brightness;
 
-
-  int i;
-  float p = 100;
-  for(i = 0; i <= 100/res; i++) {
-    float sup = value_to_percent(
-      device->curr_brightness + 0.5, 
-      device, 
-      options
-    ) + res*i;
-    float inf = value_to_percent(
-      device->curr_brightness - 0.5,
-      device,
-      options
-    ) + res*i; 
-    if (inf <= 100 + EPS) {
-      p = sup < 100 ? sup : 100;
-    } else {
-      i--;
-      break;
-    }
-  }
-
-  // We have the supremum percentage in p
-  // an exact (float) conversion to value
-  // would yield something that (barely)
-  // could not reach the current value.
-  // But we use rounding and floats are
-  // not exact. Thus we check:
-
-  int base = percent_to_value(p, device, options);
-  unsigned int reconstructed;
-  float pp;
-  do {
-    pp = value_to_percent(base, device, options);
-    reconstructed = percent_to_value(pp - i*res, device, options);
-    base--;
-  } while (device->curr_brightness < reconstructed);
+  int i = -1;
+  float max = find_base(&i, device->curr_brightness, res, device, options);
 
   i = positive ? i-1 : i+1;
-  return percent_to_value(pp - i*res, device, options);
+
+  return percent_to_value(max - i*res, device, options);
 }
+
+float find_base(int *i, unsigned int target, int delta, struct device *device, struct options *options) {
+  float sup = value_to_percent(target + 0.5, device, options);
+  float inf = value_to_percent(target - 0.5, device, options);
+  
+  bool early_exit = *i != -1;
+  if (!early_exit)
+    *i = (100 + EPS - inf) / delta;
+  for (; *i > 0; (*i)--) {
+    unsigned int base = percent_to_value(sup + (*i)*delta, device, options) + 1;
+
+search_base:
+      base--;
+      float max = value_to_percent(base, device, options);
+      unsigned int reconstructed = percent_to_value(max - (*i)*delta, device, options);
+    if (target < reconstructed) goto search_base;
+
+    if (target > reconstructed) {
+      if (early_exit)
+        return max;
+      continue;
+    }
+
+    int j = (*i)-1;
+
+    unsigned int previous = percent_to_value(max - j*delta, device, options);
+
+    max = find_base(&j, previous, delta, device, options);
+
+    reconstructed = percent_to_value(max - (*i)*delta, device, options);
+
+    if (target == reconstructed)
+      return max;
+
+    goto search_base;
+  }
+
+  return value_to_percent(target, device, options);
+}
+

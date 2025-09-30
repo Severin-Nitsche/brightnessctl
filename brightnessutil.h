@@ -12,5 +12,6 @@ extern struct device *find_device(struct options *, int *);
 extern float value_to_percent(float, struct device *, struct options *);
 extern unsigned int percent_to_value(float, struct device *, struct options *);
 extern int find_value(struct device *, struct options *);
+extern float find_base(int *, unsigned int, int delta, struct device *, struct options *);
 
 #endif
