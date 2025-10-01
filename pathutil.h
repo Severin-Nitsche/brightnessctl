@@ -10,4 +10,10 @@ extern char *dir_child(char *, char *);
 extern char *device_path(struct device *);
 extern char *class_path(char *);
 
+extern bool ensure_dir(char *dir);
+extern bool ensure_run_dir();
+extern bool ensure_dev_dir(struct device *);
+
+extern char *run_dir;
+
 #endif
