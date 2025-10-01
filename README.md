@@ -1,6 +1,6 @@
 # brightnessctl
 
-This is a fork of [Hummer's brightnessctl](https://github.com/Hommer12007/brightnessctl).
+This is a fork of [Hummer's brightnessctl](https://github.com/Hummer12007/brightnessctl).
 
 This program allows you read and control device brightness on Linux. Devices, by default, include backlight and LEDs (searched for in corresponding classes). If omitted, the first found device is selected.
 
