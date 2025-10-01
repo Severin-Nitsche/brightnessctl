@@ -23,11 +23,13 @@ The *original* program is available in:
 
 ## Build instructions
 
-To build the project simply run `make`.
+To build the project run `./configure && make`.
+Consider `./configure --help` for relevant options.
+
 A minimal environment can be created with `nix-shell -p coreutils pkg-config systemd`.
 
 > [!NOTE]
-> To enable systemd (recommended) set `ENABLE_LOGIND=1` eg. via `export ENABLE_LOGIND=1` before `make`.
+> To enable systemd (recommended) run `./configure --enable-logind`.
 
 ## Nix Overlay
 
@@ -48,11 +50,25 @@ final: prev: {
     makeFlags = [
       "PREFIX="
       "DESTDIR=$(out)"
-      "ENABLE_LOGIND=1"
+    ];
+
+    postPatch = ''
+      substituteInPlace 90-brightnessctl.rules \
+        --replace-fail /bin/ ${prev.coreutils}/bin/
+
+      substituteInPlace configure \
+        --replace-fail "pkg-config" "$PKG_CONFIG"
+    '';
+
+    configureFlags = [
+      "--enable-logind"
+      "--prefix="
     ];
   });
 }
 ```
+
+*Consider [my dotfiles](https://github.com/Severin-Nitsche/dotfiles/blob/6ac3b8c81e7f1224608754bfbdbfafbcd01d20bf/overlays/default.nix#L9) for reference*
 
 ## Permissions
 
