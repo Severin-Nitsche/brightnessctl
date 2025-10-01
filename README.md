@@ -1,12 +1,17 @@
 # brightnessctl
 
+This is a fork of [Hummer's brightnessctl](https://github.com/Hommer12007/brightnessctl).
+
 This program allows you read and control device brightness on Linux. Devices, by default, include backlight and LEDs (searched for in corresponding classes). If omitted, the first found device is selected.
 
 It can also preserve current brightness before applying the operation (allowing for usecases like disabling backlight on lid close).
 
 ## Installation
 
-The program is available in:
+> [!NOTE]
+> To run **this** fork you have to build it yourself or use the nix overlay.
+
+The *original* program is available in:
 * [Alpine Linux](https://pkgs.alpinelinux.org/packages?name=brightnessctl&branch=edge)
 * [Arch Linux](https://www.archlinux.org/packages/extra/x86_64/brightnessctl/)
 * [Void Linux](https://github.com/void-linux/void-packages/blob/master/srcpkgs/brightnessctl/template)
@@ -16,7 +21,38 @@ The program is available in:
 * [Fedora](https://src.fedoraproject.org/rpms/brightnessctl) - available in Fedora 31+
 * [NixOS/nix](https://search.nixos.org/packages?type=packages&query=brightnessctl) - starting with 17.09, please see the [NixOS Wiki page](https://wiki.nixos.org/wiki/Backlight#brightnessctl) for the "best-practice" configuration file based installation
 
-One can build and install the program using `./configure && make install`. Consult `./configure --help` for relevant build-time options.
+## Build instructions
+
+To build the project simply run `make`.
+A minimal environment can be created with `nix-shell -p coreutils pkg-config systemd`.
+
+> [!NOTE]
+> To enable systemd (recommended) set `ENABLE_LOGIND=1` eg. via `export ENABLE_LOGIND=1` before `make`.
+
+## Nix Overlay
+
+Replace `...` with the corresponding version/hash you want.
+`rev` is the commit hash. If you're having trouble with the hash, set it to `""` and copy the correct one from the error message.
+
+```nix
+final: prev: {
+  brightnessctl = prev.brightnessctl.overrideAttrs (old: {
+    version = "...";
+    src = prev.fetchFromGitHub {
+      owner = "Severin-Nitsche";
+      repo = "brightnessctl";
+      rev = "...";
+      hash = "...";
+    };
+    
+    makeFlags = [
+      "PREFIX="
+      "DESTDIR=$(out)"
+      "ENABLE_LOGIND=1"
+    ];
+  });
+}
+```
 
 ## Permissions
 
@@ -35,32 +71,6 @@ Modifying brightness requires write permissions for device files or systemd supp
 Use the [ddcci-driver-linux](https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux) kernel module to expose external monitor brightness controls to `brightnessctl`. Available in repositories of [AUR](https://aur.archlinux.org/packages/ddcci-driver-linux-dkms/), [Debian](https://packages.debian.org/stable/ddcci-dkms), [Nix](https://github.com/NixOS/nixpkgs/blob/master/pkgs/os-specific/linux/ddcci/default.nix), [Ubuntu](https://packages.ubuntu.com/search?suite=all&searchon=names&keywords=ddcci-dkms), [Void](https://github.com/void-linux/void-packages/tree/master/srcpkgs/ddcci-dkms).
 
 ## Usage
-```
-Usage: brightnessctl [options] [operation] [value]
 
-Options:
-  -l, --list			list devices with available brightness controls.
-  -q, --quiet			suppress output.
-  -p, --pretend			do not perform write operations.
-  -m, --machine-readable	produce machine-readable output.
-  -n, --min-value		set minimum brightness, defaults to 1.
-  -e, --exponent[=K]		changes percentage curve to exponential.
-  -s, --save			save previous state in a temporary file.
-  -r, --restore			restore previous saved state.
-  -h, --help			print this help.
-  -d, --device=DEVICE		specify device name (can be a wildcard).
-  -c, --class=CLASS		specify device class.
-  -V, --version			print version and exit.
-
-Operations:
-  i, info			get device info.
-  g, get			get current brightness of the device.
-  m, max			get maximum brightness of the device.
-  s, set VALUE			set brightness of the device.
-
-Valid values:
-  specific value		Example: 500
-  percentage value		Example: 50%
-  specific delta		Example: 50- or +10
-  percentage delta		Example: 50%- or +10%
- ```
+Take a look at `brightnessctl --help`.
+There is also a manpage available.
