@@ -7,7 +7,6 @@
 
 static struct options options = {
   .quiet = false,
-  .pretend = false,
   .machine_readable = false,
   .help = false,
   .version = false,
@@ -25,11 +24,10 @@ static struct options options = {
 int main(int argc, char *const *argv) {
   int opt;
 
-  const char *optstring = "+qpmd:c:hvsn:e::rl";
+  const char *optstring = "+qmd:c:hvsn:e::rl";
 
   const struct option long_options[] = {
     {"quiet", no_argument, NULL, 'q'},
-    {"pretend", no_argument, NULL, 'p'},
     {"machine-readable", no_argument, NULL, 'm'},
     {"device", required_argument, NULL, 'd'},
     {"class", required_argument, NULL, 'c'},
@@ -69,9 +67,6 @@ int main(int argc, char *const *argv) {
     switch (opt) {
       case 'q':
         options.quiet = true;
-        break;
-      case 'p':
-        options.pretend = true;
         break;
       case 'm':
         options.machine_readable = true;

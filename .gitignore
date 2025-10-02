@@ -2,3 +2,4 @@ brightnessctl
 *.swp
 config.mk
 build/**
+docs/**

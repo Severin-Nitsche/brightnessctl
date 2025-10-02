@@ -12,7 +12,6 @@ void print_help(struct options *options) {
   const char *set = "Usage: brightnessctl set [options...] [value]\n";
   const char *general_options =
     "Options:\n"
-    "  -p, --pretend           do not perform write operations\n"
     "  -m, --machine-readable  produce machine readable output\n"
     "  -d, --device=DEVICE     specify device name\n"
     "  -c, --class=CLASS       specify device class\n"
