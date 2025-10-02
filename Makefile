@@ -1,29 +1,40 @@
 include config.mk
 
+PROGRAM = brightnessctl
 VERSION = 0.6
-CFLAGS += -std=c99 -g -Wall -Wextra -DVERSION=\"${VERSION}\" -D_POSIX_C_SOURCE=200809L
+
+CFLAGS += -std=c99 -g -Wall -Wextra -DVERSION=\"${VERSION}\" -D_POSIX_C_SOURCE=200809L -Iinclude
 LDLIBS += -lm
 
+SRCDIR = src
+BUILDDIR = build
 BINDIR = ${DESTDIR}${PREFIX}/bin
 MANDIR = ${DESTDIR}${PREFIX}/share/man
 
 INSTALL_UDEV_1 = install_udev_rules
 
-all: brightnessctl brightnessctl.1
+SRCS := $(wildcard $(SRCDIR)/*.c)
+OBJS := $(SRCS:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
 
-brightnessctl: pathutil.o brightnesslib.o brightnessprog.o brightnessutil.o restoreutil.o
+all: $(BUILDDIR)/$(PROGRAM) $(PROGRAM).1
+
+$(BUILDDIR)/$(PROGRAM): $(OBJS)
+	$(CC) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c
+	mkdir -p $(BUILDDIR)
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $^ -o $@
 
 install: all ${INSTALL_UDEV_${INSTALL_UDEV_RULES}}
 	install -d ${BINDIR} ${MANDIR}/man1
-	install -m ${MODE} brightnessctl   ${BINDIR}/
-	install -m 0644    brightnessctl.1 ${MANDIR}/man1
+	install -m ${MODE} ${BUILDDIR}/${PROGRAM} ${BINDIR}/
+	install -m 0644 ${PROGRAM}.1 ${MANDIR}/man1
 
 install_udev_rules:
 	install -d ${DESTDIR}${UDEVDIR}
-	install -m 0644 90-brightnessctl.rules ${DESTDIR}${UDEVDIR}
+	install -m 0644 90-${PROGRAM}.rules ${DESTDIR}${UDEVDIR}
 
 clean:
-	rm -f brightnessctl
-	rm -f *.o
+	rm -rf $(BUILDDIR)
 
-.PHONY: all install clean install_udev_rules
+.PHONY: all install clean install_udev_rules dir
