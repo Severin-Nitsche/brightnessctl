@@ -65,6 +65,8 @@ float value_to_percent(float value, struct device *device, struct options *optio
 unsigned int percent_to_value(float percent, struct device *device, struct options *options) {
   if (percent <= 0)
     return 0;
+  if (percent >= 100)
+    return device->max_brightness;
   return roundf(powf(percent / 100, options->exponent) * device->max_brightness);
 }
 
