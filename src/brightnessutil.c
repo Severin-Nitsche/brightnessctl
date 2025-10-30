@@ -111,7 +111,9 @@ int find_value(struct device *device, struct options *options) {
 float find_base(int *i, unsigned int target, int delta, struct device *device, struct options *options) {
   float sup = value_to_percent(target + 0.5, device, options);
   float inf = value_to_percent(target - 0.5, device, options);
-  
+
+  unsigned int previousPrevious = -1;
+
   bool early_exit = *i != -1;
   if (!early_exit)
     *i = (100 + EPS - inf) / delta;
@@ -133,6 +135,10 @@ search_base:
     int j = (*i)-1;
 
     unsigned int previous = percent_to_value(max - j*delta, device, options);
+    if (previous >= previousPrevious)
+      goto search_base;
+
+    previousPrevious = previous;
 
     max = find_base(&j, previous, delta, device, options);
 
