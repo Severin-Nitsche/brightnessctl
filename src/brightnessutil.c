@@ -112,13 +112,12 @@ float find_base(int *i, unsigned int target, int delta, struct device *device, s
   float sup = value_to_percent(target + 0.5, device, options);
   float inf = value_to_percent(target - 0.5, device, options);
 
-  unsigned int previousPrevious = -1;
-
   bool early_exit = *i != -1;
   if (!early_exit)
     *i = (100 + EPS - inf) / delta;
   for (; *i > 0; (*i)--) {
     unsigned int base = percent_to_value(sup + (*i)*delta, device, options) + 1;
+    unsigned int previousPrevious = -1;
 
 search_base:
       base--;
